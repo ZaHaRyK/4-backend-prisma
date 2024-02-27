@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Film {
+  id            Int        @id @default(autoincrement())
+  title         String
+  episode_id    Int
+  opening_crawl String     @db.LongText
+  director      String
+  producer      String
+  release_date  String
+  characters    People[]
+  planets       Planet[]
+  starships     Starship[]
+  vehicles      Vehicle[]
+  species       Specie[]
+  created       String
+  edited        String
+  images        Image[]
+
+  @@map("films")
+}
+
+model People {
+  id          Int        @id @default(autoincrement())
+  name        String
+  height      String
+  mass        String
+  hair_color  String
+  skin_color  String
+  eye_color   String
+  birth_year  String
+  gender      String
+  homeworldId Int?
+  homeworld   Planet?     @relation(fields: [homeworldId], references: [id])
+  films       Film[]
+  species     Specie[]
+  vehicles    Vehicle[]
+  starships   Starship[]
+  created     String
+  edited      String
+  images      Image[]
+
+  @@map("people")
+}
+
+model Planet {
+  id              Int      @id @default(autoincrement())
+  name            String
+  rotation_period String
+  orbital_period  String
+  diameter        String
+  climate         String
+  gravity         String
+  terrain         String
+  surface_water   String
+  population      String
+  residents       People[]
+  films           Film[]
+  created         String
+  edited          String
+  images          Image[]
+
+  @@map("planets")
+}
+
+model Specie {
+  id               Int      @id @default(autoincrement())
+  name             String
+  classification   String
+  designation      String
+  average_height   String
+  skin_colors      String
+  hair_colors      String
+  eye_colors       String
+  average_lifespan String
+  language         String
+  people           People[]
+  films            Film[]
+  created          String
+  edited           String
+  images           Image[]
+
+  @@map("species")
+}
+
+model Starship {
+  id                     Int      @id @default(autoincrement())
+  name                   String
+  model                  String
+  manufacturer           String
+  cost_in_credits        String
+  length                 String
+  max_atmosphering_speed String
+  crew                   String
+  passengers             String
+  cargo_capacity         String
+  consumables            String
+  hyperdrive_rating      String
+  MGLT                   String
+  starship_class         String
+  pilots                 People[]
+  films                  Film[]
+  created                String
+  edited                 String
+  images                 Image[]
+
+  @@map("starships")
+}
+
+model Vehicle {
+  id                     Int      @id @default(autoincrement())
+  name                   String
+  model                  String
+  manufacturer           String
+  cost_in_credits        String
+  length                 String
+  max_atmosphering_speed String
+  crew                   String
+  passengers             String
+  cargo_capacity         String
+  consumables            String
+  vehicle_class          String
+  pilots                 People[]
+  films                  Film[]
+  created                String
+  edited                 String
+  images                 Image[]
+
+  @@map("vehicles")
+}
+
+model Image {
+  id                 Int    @id @default(autoincrement())
+  file_name          String
+  file_original_name String
+  aws_url            String @db.LongText
+
+  films     Film[]
+  people    People[]
+  planets   Planet[]
+  species   Specie[]
+  starships Starship[]
+  vehicles  Vehicle[]
+
+  @@map("images")
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  username      String
+  password      String
+  role          Role    @default(User)
+  refresh_token String?
+
+  @@map("users")
+}
+
+enum Role {
+  User
+  Admin
+}

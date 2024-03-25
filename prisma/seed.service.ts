@@ -37,7 +37,7 @@ export class SeedService {
 
   public async getData() {
     for (const essence in entities) {
-      const swapiUrl = 'https://swapi.dev/api/';
+      const swapiUrl = 'https://swapi-api.hbtn.io/api/';
       const entity = entities[essence];
       let url = swapiUrl + entity;
       for (; url; ) {
@@ -58,7 +58,7 @@ export class SeedService {
     return this.data;
   }
   public async deleteRelationsInData(entityName: string) {
-    this.data[entityName].map(async (entity, index) => {
+    this.data[entityName].map(async (entity, index: number) => {
       const url: string = entity.url;
       const { relationId } = await this.getIdFromUrl(url);
       entity.id = relationId;

@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// import { EntityNotFoundExceptionFilter } from './filters/entity.not.found.filters';
+import { PrismaClientExceptionFilter } from './filters/entity.not.found.exception.filter';
 import { HttpExceptionFilter } from './filters/http.exeption.filters';
 import { AppModule } from './app.module';
 import 'dotenv/config';
@@ -9,7 +9,8 @@ import { PrismaService } from './prisma.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  // app.useGlobalFilters(new EntityNotFoundExceptionFilter());
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()

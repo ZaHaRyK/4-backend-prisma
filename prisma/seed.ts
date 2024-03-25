@@ -17,23 +17,23 @@ const namesModels = {
 async function run(): Promise<void> {
   await seedService.getData();
 
-  // for (const entity in seedService.data) {
-  //   const nameModel = namesModels[entity];
-  //   await prisma[`${nameModel}`].createMany({
-  //     data: seedService.data[entity],
-  //   });
-  // }
+  for (const entity in seedService.data) {
+    const nameModel = namesModels[entity];
+    await prisma[`${nameModel}`].createMany({
+      data: seedService.data[entity],
+    });
+  }
 
   const oldData = _.cloneDeep(seedService.data);
   for (const entityName in seedService.data) {
     await Promise.all(
-      seedService.dataWithRelations[entityName].map(async (entity, index) => {
+      seedService.dataWithRelations[entityName].map(async (entity, index: number) => {
         for (const parameter of seedService.relations) {
           if (entity[parameter]) {
             for await (const url of Array.isArray(entity[parameter])
               ? entity[parameter]
               : [entity[parameter]]) {
-              // *_* СУПЕР КОСТИЛЬ ^^^^^
+
               seedService.data[entityName][index][parameter] ||= [];
 
               const { relationEntityName, relationId } =
@@ -57,36 +57,45 @@ async function run(): Promise<void> {
                 }
               }
             }
-            if (parameter === 'homeworld') {
-              seedService.data[entityName][index][parameter] = {
-                connectOrCreate: {
-                  where: seedService.data[entityName][index][parameter].id,
-                  create: seedService.data[entityName][index][parameter],
-                },
-              };
-            } else {
-              seedService.data[entityName][index][parameter] = {
-                connectOrCreate: seedService.data[entityName][index][
-                  parameter
-                ].map((entity) => {
-                  return {
-                    where: { id: entity.id },
-                    create: entity,
-                  };
-                }),
-              };
-              console.log(seedService.data[entityName][index][parameter]);
+            try {
+              if (parameter === 'homeworld') {
+                seedService.data[entityName][index][parameter] = {
+                  connect: {
+                    id: seedService.data[entityName][index][parameter].id,
+                  },
+                };
+              } else {
+                if (parameter == 'pilots'){
+                  seedService.data[entityName][index][parameter] ||= [];
+                }
+                seedService.data[entityName][index][parameter] = {
+                  connect: seedService.data[entityName][index][
+                      parameter
+                      ].map((entity) => {
+                    return { id: entity.id };
+                  }),
+                };
+              }
             }
+            catch (e) {
+              console.log(e)
+            }
+
           }
         }
 
         const nameOfModel = namesModels[entityName];
-        // console.log(JSON.stringify(seedService.data[entityName][index]), '\n');
-        // seedService.data.people[25].id = 17;
-        await prisma[`${nameOfModel}`].create({
-          // where: { id: seedService.data[entityName][index].id },
-          data: seedService.data[entityName][index],
-        });
+
+        const saveEntity = seedService.data[entityName][index];
+
+        try {
+          await prisma[`${nameOfModel}`].update({
+            data: saveEntity,
+            where: {id: saveEntity.id},
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }),
     );
   }

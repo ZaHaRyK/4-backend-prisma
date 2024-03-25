@@ -46,17 +46,17 @@ export class FilmController {
     return this.filmServices.getOne(id);
   }
 
-  // @ApiBearerAuth()
-  // @Post('create')
-  // @Roles(Role.Admin)
-  // @UseInterceptors(FilesInterceptor('files'))
-  // @ApiConsumes('multipart/form-data')
-  // create(
-  //   @Body() body: FilmCreateDto,
-  //   @UploadedFiles() files: Express.Multer.File[],
-  // ) {
-  //   return this.filmServices.create(body, files);
-  // }
+  @ApiBearerAuth()
+  @Post('create')
+  @Roles(Role.Admin)
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiConsumes('multipart/form-data')
+  create(
+    @Body() body: FilmCreateDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.filmServices.create(body, files);
+  }
   //
   // @ApiBearerAuth()
   // @Put('update/:id')

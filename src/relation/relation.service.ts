@@ -7,7 +7,7 @@ export class RelationService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createRelation(type: string, idOfRelationModel: number, dto: Object) {
-    const relationModel = await this.prisma[type].findUnique({
+    const relationModel = await this.prisma[type].findFirst({
       where: { id: idOfRelationModel },
     });
     const oldRelationModel = _.cloneDeep(relationModel);
@@ -17,7 +17,7 @@ export class RelationService {
         const arr = dto[relation];
         await Promise.all(
           (Array.isArray(arr) ? arr : [arr]).map(async (id: number) => {
-            const essence = await this.prisma[type].findUnique({
+            const essence = await this.prisma[type].findFirst({
               where: { id },
             });
 

@@ -7,14 +7,11 @@ import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class FileImagesService {
-  private readonly image: string;
   constructor(
     private readonly prisma: PrismaService,
     private fileServices: FileService,
     private bucketServices: BucketService,
-  ) {
-    this.image = 'image';
-  }
+  ) {}
 
   async appendFiles(files: Express.Multer.File[]) {
     const resFiles: Image[] = [];

@@ -5,6 +5,9 @@ import { FilmCreateDto } from './filmDto/film.create.dto';
 import { FilmUpdateDto } from './filmDto/film.update.dto';
 import { FilmRelationDto } from './filmDto/film.relation.dto';
 import { PrismaService } from '../../prisma.service';
+import {Film} from "@prisma/client";
+import * as _ from 'lodash';
+
 
 @Injectable()
 export class FilmService {
@@ -19,5 +22,14 @@ export class FilmService {
 
   async getOne(id: number) {
     return this.prisma.film.findUnique({ where: { id } });
+  }
+
+  async create(filmCreateDto: FilmCreateDto, files: Express.Multer.File[]) {
+    const film = Object.assign(filmCreateDto);
+    console.log(film);
+    film.images = await this.fileImagesService.appendFiles(files);
+    console.log(await this.fileImagesService.appendFiles(files));
+    console.log(film);
+    return this.prisma.film.create({data: film})
   }
 }

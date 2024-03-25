@@ -7,7 +7,7 @@ export class FilmCreateDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ type: 'number', example: 4 })
+  @ApiProperty({ type: Number, example: 4 })
   @IsNumber()
   @IsNotEmpty()
   episode_id: number;
